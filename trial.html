@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f4f4f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    h2, h3 {
+      text-align:left;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .resume {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .skills, .soft-skills, .languages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .skills span, .soft-skills span, .languages div {
+      background-color: #007bff;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+
+    .language-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar {
+      height: 10px;
+      background-color: #007bff;
+      border-radius: 4px;
+      width: 100px;
+    }
+
+    .profile-photo {
+      float: right;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .right-aligned {
+      text-align: right;
+    }
+    /* Ensure labels and checkboxes align properly */
+label {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Adjust the gap between the checkbox and text */
+}
+
+input[type="checkbox"] {
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+
+/* Optional: Add some margin for the input fields for clarity */
+input, textarea {
+  margin-bottom: 10px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Resume Builder</h2>
+    <form id="resume-form">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Enter your full name">
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email">
+
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" placeholder="Enter your phone number">
+
+      <label for="linkedin">LinkedIn Profile (Optional)</label>
+      <input type="url" id="linkedin" placeholder="Enter your LinkedIn profile URL">
+
+      <label for="github">GitHub Profile (Optional)</label>
+      <input type="url" id="github" placeholder="Enter your GitHub profile URL">
+
+      <label for="photo">Profile Photo (JPEG only)</label>
+      <input type="file" id="photo" accept="image/jpeg">
+
+      <label for="summary">Profile Summary</label>
+      <textarea id="summary" rows="4" placeholder="Enter a brief profile summary"></textarea>
+
+      <h3>Work Experience</h3>
+      <div id="work-experience-container"></div>
+      <button type="button" onclick="addWorkExperience()">Add Work Experience</button>
+
+      <h3>Education</h3>
+      <div id="education-container"></div>
+      <button type="button" onclick="addEducation()">Add Education</button>
+
+      <h3>Projects</h3>
+      <div id="project-container"></div>
+      <button type="button" onclick="addProject()">Add Project</button>
+
+      <h3>Skills</h3>
+      <input type="text" id="skill-input" placeholder="Enter a skill and press Enter" onkeypress="handleSkillInput(event)">
+      <div id="skills-container" class="skills"></div>
+
+      <h3>Soft Skills</h3>
+      <input type="text" id="soft-skill-input" placeholder="Enter a soft skill and press Enter" onkeypress="handleSoftSkillInput(event)">
+      <div id="soft-skills-container" class="soft-skills"></div>
+      <!-- Add to the form for input -->
+<!-- Add the "Extracurricular Achievements" Section to the Form -->
+<h3>Extracurricular Achievements</h3>
+<div id="extracurricular-container">
+  <div class="achievement">
+    <label for="achievement-1">Achievement 1:</label>
+    <input type="text" id="achievement-1" name="achievement-1" placeholder="Enter achievement">
+  </div>
+</div>
+<button type="button" onclick="addAchievement()">Add More Achievement</button>
+
+
+
+      <h3>Languages</h3>
+      <div id="language-container"></div>
+      <button type="button" onclick="addLanguage()">Add Language</button>
+
+      <button type="button" onclick="generateResume()">Generate Resume</button>
+      <button type="button" onclick="downloadResumeAsPDF()">Download Resume as PDF</button>
+    
+
+    </form>
+  </div>
+
+  <div class="resume" id="resume"></div>
+
+  <script>
+    let workCounter = 0, educationCounter = 0, projectCounter = 0, languageCounter = 0;
+
+    function addWorkExperience() {
+  const container = document.getElementById('work-experience-container');
+  container.insertAdjacentHTML('beforeend', `
+    <div class="work-entry">
+      <input type="text" placeholder="Position">
+      <input type="text" placeholder="Company">
+      <input type="month" placeholder="Start Date">
+      <input type="month" placeholder="End Date">
+      <textarea rows="3" placeholder="Responsibilities"></textarea>
+      <label for="current-job">Currently Working</label>
+      <input type="checkbox" id="current-job">
+      <button onclick="this.parentElement.remove()">Delete</button>
+    </div>
+  `);
+}
+
+function addEducation() {
+  const container = document.getElementById('education-container');
+  container.insertAdjacentHTML('beforeend', `
+    <div class="education-entry">
+      <input type="text" placeholder="Degree">
+      <input type="text" placeholder="Institution">
+      <input type="month" placeholder="Start Date">
+      <input type="month" placeholder="End Date">
+      <textarea rows="3" placeholder="Responsibilities"></textarea>
+      <label for="currently-studying">Currently Studying</label>
+      <input type="checkbox" id="currently-studying">
+      <button onclick="this.parentElement.remove()">Delete</button>
+    </div>
+  `);
+}
+
+
+    function addProject() {
+      const container = document.getElementById('project-container');
+      container.insertAdjacentHTML('beforeend', `
+        <div class="project-entry">
+          <input type="text" placeholder="Project Title">
+          <textarea rows="3" placeholder="Description"></textarea>
+          <button onclick="this.parentElement.remove()">Delete</button>
+        </div>
+      `);
+    }
+
+    function handleSkillInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const skill = event.target.value.trim();
+        if (skill) {
+          const skillItem = document.createElement('span');
+          skillItem.textContent = skill;
+          document.getElementById('skills-container').appendChild(skillItem);
+          event.target.value = '';
+        }
+      }
+    }
+
+    function handleSoftSkillInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const softSkill = event.target.value.trim();
+        if (softSkill) {
+          const skillItem = document.createElement('span');
+          skillItem.textContent = softSkill;
+          document.getElementById('soft-skills-container').appendChild(skillItem);
+          event.target.value = '';
+        }
+      }
+    }
+    let achievementCount = 1;
+
+function addAchievement() {
+  achievementCount++;
+  
+  const achievementContainer = document.getElementById('extracurricular-container');
+  
+  // Create new input field for the new achievement
+  const newAchievement = document.createElement('div');
+  newAchievement.classList.add('achievement');
+  newAchievement.innerHTML = `
+    <label for="achievement-${achievementCount}">Achievement ${achievementCount}:</label>
+    <input type="text" id="achievement-${achievementCount}" name="achievement-${achievementCount}" placeholder="Enter achievement">
+    
+  `;
+  
+  // Append the new input field to the container
+  achievementContainer.appendChild(newAchievement);
+  
+}
+
+
+    function addLanguage() {
+      const container = document.getElementById('language-container');
+      container.insertAdjacentHTML('beforeend', `
+        <div class="language-entry">
+          <input type="text" placeholder="Language">
+          <select>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Fluent">Fluent</option>
+            <option value="Native">Native</option>
+          </select>
+          <button onclick="this.parentElement.remove()">Delete</button>
+        </div>
+      `);
+    }
+
+    function generateResume() {
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+  const linkedin = document.getElementById('linkedin').value;
+  const github = document.getElementById('github').value;
+  const summary = document.getElementById('summary').value;
+
+  const profilePhoto = document.getElementById('photo').files[0];
+  const profilePhotoUrl = profilePhoto ? URL.createObjectURL(profilePhoto) : '';
+
+  const skills = [...document.getElementById('skills-container').children].map(item => item.textContent);
+  const softSkills = [...document.getElementById('soft-skills-container').children].map(item => item.textContent);
+
+  const languages = [...document.getElementById('language-container').children].map(item => {
+    const language = item.querySelector('input').value;
+    const proficiency = item.querySelector('select').value;
+    return { language, proficiency };
+  });
+
+  let workExperience = '';
+  [...document.getElementById('work-experience-container').children].forEach(entry => {
+    const position = entry.querySelector('input:nth-of-type(1)').value;
+    const company = entry.querySelector('input:nth-of-type(2)').value;
+    const startDate = entry.querySelector('input:nth-of-type(3)').value;
+    const endDate = entry.querySelector('input:nth-of-type(4)').value;
+    const responsibilities = entry.querySelector('textarea').value;
+    const isCurrentJob = entry.querySelector('input[type="checkbox"]').checked ? " (Currently Working)" : "";
+    workExperience += `<div><strong>${position} at ${company}${isCurrentJob}</strong> (${startDate} - ${endDate})<br>${responsibilities}</div><br>`;
+  });
+
+  let education = '';
+  [...document.getElementById('education-container').children].forEach(entry => {
+    const degree = entry.querySelector('input:nth-of-type(1)').value;
+    const institution = entry.querySelector('input:nth-of-type(2)').value;
+    const startDate = entry.querySelector('input:nth-of-type(3)').value;
+    const endDate = entry.querySelector('input:nth-of-type(4)').value;
+    const responsibilities = entry.querySelector('textarea').value;
+    const isCurrentlyStudying = entry.querySelector('input[type="checkbox"]').checked ? " (Currently Studying)" : "";
+    education += `<div><strong>${degree}</strong> at ${institution}${isCurrentlyStudying} (${startDate} - ${endDate})<br>${responsibilities}</div><br>`;
+  });
+
+  let projects = '';
+  [...document.getElementById('project-container').children].forEach(entry => {
+    const projectTitle = entry.querySelector('input').value;
+    const projectDesc = entry.querySelector('textarea').value;
+    projects += `<div><strong>${projectTitle}</strong>: ${projectDesc}</div><br>`;
+  });
+
+  let achievements = [];
+  for (let i = 1; i <= achievementCount; i++) {
+    const achievement = document.getElementById(`achievement-${i}`).value;
+    if (achievement) {
+      achievements.push(achievement);
+    }
+  }
+
+  let languageBars = languages.map(lang => {
+    const proficiency = {
+      'Beginner': 25,
+      'Intermediate': 50,
+      'Fluent': 75,
+      'Native': 100
+    }[lang.proficiency];
+    return `<div class="language-bar"><strong>${lang.language}</strong><div class="bar" style="width: ${proficiency}%"></div></div>`;
+  }).join('');
+
+  const resumeHTML = `
+    <div class="resume">
+      <div class="contact-info" style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <h2>${name}</h2>
+        ${profilePhotoUrl ? `<img src="${profilePhotoUrl}" alt="Profile Photo" class="profile-photo" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px;">` : ''}
+        <p>Email: ${email} | Phone: ${phone}</p>
+        ${linkedin ? `<p><a href="${linkedin}" target="_blank">LinkedIn</a></p>` : ''}
+        ${github ? `<p><a href="${github}" target="_blank">GitHub</a></p>` : ''}
+      </div>
+      <h3>Profile Summary</h3>
+      <p>${summary}</p>
+      <h3>Work Experience</h3>
+      ${workExperience}
+      <h3>Education</h3>
+      ${education}
+      <h3>Projects</h3>
+      ${projects}
+      <h3>Skills</h3>
+      <div class="skills">${skills.map(skill => `<span>${skill}</span>`).join('')}</div>
+      <h3>Soft Skills</h3>
+      <div class="soft-skills">${softSkills.map(skill => `<span>${skill}</span>`).join('')}</div>
+      <h3>Extracurricular Achievements</h3>
+      <p>${achievements}</p>
+      <h3>Languages</h3>
+      ${languageBars}
+    </div>
+  `;
+
+  document.getElementById('resume').innerHTML = resumeHTML;
+}
+
+function downloadResumeAsPDF() {
+      const resumeContent = document.getElementById('resume');
+
+      // Generate PDF using html2pdf.js
+      const options = {
+        margin:       10,
+        filename:     'resume.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { dpi: 192, scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      // Convert the HTML content to PDF and download it
+      html2pdf().from(resumeContent).set(options).save();
+    }
+
+  </script>
+</body>
+</html>
+

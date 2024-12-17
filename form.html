@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder</title>
+  <style>
+    /* General reset */
+   
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Form to collect user details -->
+    <div class="form-container">
+      <h2>Fill in Your Details</h2>
+
+      <form id="resumeForm">
+        <!-- Profile Section -->
+        <h3>Profile</h3>
+        <textarea id="profile" rows="5" placeholder="Write your profile..."></textarea>
+
+        <!-- Skills Section -->
+        <h3>Skills (Comma Separated)</h3>
+        <input type="text" id="skills" placeholder="Enter your skills">
+
+        <!-- Experience Section -->
+        <h3>Experience</h3>
+        <textarea id="experience" rows="5" placeholder="Write your work experience..."></textarea>
+
+        <!-- Education Section -->
+        <h3>Education</h3>
+        <input type="text" id="education" placeholder="Enter your education details">
+
+        <!-- Projects Section -->
+        <h3>Projects</h3>
+        <textarea id="projects" rows="5" placeholder="Enter details of your projects..."></textarea>
+
+        <!-- Languages Section -->
+        <h3>Languages</h3>
+        <input type="text" id="languages" placeholder="Enter your languages and proficiency (comma separated)">
+
+        <button type="submit">Generate Resume</button>
+      </form>
+    </div>
+
+    <!-- Generated Resume -->
+    <div class="resume-container" id="resumeContainer" style="display:none;">
+      <h1 id="resumeName">John Doe</h1>
+      <p id="resumeContact">Email: johndoe@example.com | Phone: +123 456 7890</p>
+
+      <!-- Profile Section -->
+      <h2>Profile</h2>
+      <p id="resumeProfile">Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+
+      <!-- Skills Section -->
+      <h2>Skills</h2>
+      <ul id="resumeSkills">
+        <li>JavaScript</li>
+        <li>React</li>
+        <li>Node.js</li>
+      </ul>
+
+      <!-- Experience Section -->
+      <h2>Experience</h2>
+      <p id="resumeExperience">Worked as a key member of the team responsible for developing and maintaining web applications...</p>
+
+      <!-- Education Section -->
+      <h2>Education</h2>
+      <p id="resumeEducation">Bachelor of Science in Computer Science</p>
+
+      <!-- Projects Section -->
+      <h2>Projects</h2>
+      <ul id="resumeProjects">
+        <li>Project 1</li>
+        <li>Project 2</li>
+      </ul>
+
+      <!-- Languages Section -->
+      <h2>Languages</h2>
+      <ul id="resumeLanguages">
+        <li>English - Fluent</li>
+        <li>Spanish - Intermediate</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    // Function to handle form submission and dynamically populate the resume
+    document.getElementById('resumeForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Collecting form data
+      const profile = document.getElementById('profile').value;
+      const skills = document.getElementById('skills').value.split(',').map(skill => skill.trim());
+      const experience = document.getElementById('experience').value;
+      const education = document.getElementById('education').value;
+      const projects = document.getElementById('projects').value.split(',').map(project => project.trim());
+      const languages = document.getElementById('languages').value.split(',').map(lang => lang.trim());
+
+      // Updating the resume template with form data
+      document.getElementById('resumeProfile').textContent = profile;
+      document.getElementById('resumeSkills').innerHTML = skills.map(skill => `<li>${skill}</li>`).join('');
+      document.getElementById('resumeExperience').textContent = experience;
+      document.getElementById('resumeEducation').textContent = education;
+      document.getElementById('resumeProjects').innerHTML = projects.map(project => `<li>${project}</li>`).join('');
+      document.getElementById('resumeLanguages').innerHTML = languages.map(lang => `<li>${lang}</li>`).join('');
+
+      // Show the generated resume and hide the form
+      document.getElementById('resumeContainer').style.display = 'block';
+      document.querySelector('.form-container').style.display = 'none';
+    });
+  </script>
+
+</body>
+</html>
